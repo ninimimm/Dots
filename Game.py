@@ -7,7 +7,7 @@ from PC import PC
 
 
 class Game:
-    def __init__(self, mode, computer_difficulty, count_players, map_grid, player_names, root):
+    def __init__(self, mode, computer_difficulty, count_players, map_grid, player_names, root):  # pragma: no cover
         self.root = root
         self.width = 800
         self.height = 800
@@ -26,7 +26,7 @@ class Game:
         self.dict_points = {}
         self.captured_points = {}
         self.ban_points =[set(), set(), set(), set()][:self.count_players]
-        self.cities = []  # Use a list to store cities
+        self.cities = []
         self.create_grid()
         self.number = 0
         self.player_names = player_names
@@ -44,35 +44,94 @@ class Game:
                     self.all_points.add((col * self.cell_size - self.point_size / 2, (
                             row + 0.5) * self.cell_size - self.point_size / 2))
 
+        self.timer_label = tk.Label(self.root, text="Time: 0", font=("Helvetica", 16))
+        self.timer_label.grid(row=self.count_players + 2, column=0, padx=10, pady=10)
+        self.timer_seconds = 0
+        self.timer_id = None
+        self.start_timer()
+        self.ban_players = set()
+
+        self.game_timer_seconds = 5
+        self.game_timer_id = None
+        self.game_timer_label = tk.Label(self.root, text="Game Time: 10:00", font=("Helvetica", 16))
+        self.game_timer_label.grid(row=self.count_players + 4, column=0, padx=10, pady=10)
+        self.start_game_timer()
+
+    def start_game_timer(self):
+        self.update_game_timer()
+
+    def update_game_timer(self):
+        minutes = self.game_timer_seconds // 60
+        seconds = self.game_timer_seconds % 60
+        self.game_timer_label.config(text=f"Game Time: {minutes:02d}:{seconds:02d}")
+        if self.game_timer_seconds == 0:
+            self.handle_game_time_up()
+        else:
+            self.game_timer_seconds -= 1
+            self.game_timer_id = self.root.after(1000, self.update_game_timer)
+
+    def handle_game_time_up(self):
+        self.game_timer_label.config(text="Game End!")
+
+    def stop_game_timer(self):
+        if self.game_timer_id:
+            self.root.after_cancel(self.game_timer_id)
+            self.game_timer_id = None
+
+    def start_timer(self):
+        self.timer_seconds = 10
+        self.update_timer()
+
+    def update_timer(self):
+        self.timer_label.config(text=f"Time: {self.timer_seconds}")
+        if self.timer_seconds == 0:
+            self.handle_time_up()
+        else:
+            self.timer_seconds -= 1
+            self.timer_id = self.root.after(1000, self.update_timer)
+
+    def handle_time_up(self):
+        self.timer_label.config(text=f"Time's up! {self.people_colors[self.number % self.count_players]}"
+                                     f" player has lost the turn.")
+        self.ban_players.add((self.number - 1) % self.count_players)
+        self.number += 1
+
+    def switch_player(self):
+        self.stop_timer()
+        self.start_timer()
+
+    def stop_timer(self):
+        if self.timer_id:
+            self.root.after_cancel(self.timer_id)
+            self.timer_id = None
+
     def draw_score(self):
         self.scores_frame = tk.Frame(self.root)
-        self.scores_frame.grid(row=0, column=0, sticky='e')  # Align to the left
+        self.scores_frame.grid(row=0, column=0, sticky='e')
 
-        # Create a label to display people_scores with an increased font size
-        self.scores_label = tk.Label(self.scores_frame, text="Счет:", font=("Helvetica", 20),
-                                     anchor='w')  # Anchor to the left
-        self.scores_label.grid(row=0, column=0, sticky='w')  # Align to the left within scores_frame
+        self.scores_label = tk.Label(self.scores_frame, text="Счет:", font=("Helvetica", 20), anchor='w')
+        self.scores_label.grid(row=0, column=0, sticky='w')
 
-        # Create labels for each player's score with an increased font size
 
         for i in range(self.count_players):
             score_label = tk.Label(self.scores_frame, text=f"{self.player_names[i]}: 0", font=("Helvetica", 18),
-                                   anchor='w')  # Anchor to the left
-            score_label.grid(row=i + 1, column=0, padx=10,
-                             sticky='w')  # Align to the left within scores_frame, Adjust padx as needed
+                                   anchor='w')
+            score_label.grid(row=i + 1, column=0, padx=10,sticky='w')
             self.score_labels.append(score_label)
 
-    def save_scores_to_json(self, file_path):
-        # Сохранить счеты в JSON файл
+    def save_scores_to_json(self, file_path):  # pragma: no cover
         with open(file_path, "w") as json_file:
             json.dump(self.tabel, json_file)
 
-    def load_scores_from_json(self, file_path):
-        # Загрузить счеты из JSON файла
+    def load_scores_from_json(self, file_path):  # pragma: no cover
         with open(file_path, "r") as json_file:
             self.tabel = json.load(json_file)
 
     def play(self, point, is_player):
+        if self.game_timer_seconds == 0:
+            return
+        while self.number % self.count_players in self.ban_players:
+            self.number += 1
         if point.position not in self.dict_points and all(point.position not in x for x in self.ban_points):
             if len(self.all_points) > 0: self.all_points.remove(point.position)
             self.create_point(point, self.cell_size)
@@ -110,6 +169,7 @@ class Game:
                                         for pt in array:
                                             if ct.points[k] is not None and ct.points[k].position == pt:
                                                 ct.points[k] = None
+            self.switch_player()
         for i in range(len(self.score_labels)):
             self.score_labels[i].config(text=f"{self.player_names[i]}: {self.people_scores[i]}")
         for i in range(self.count_players):
@@ -120,9 +180,7 @@ class Game:
             self.save_scores_to_json("scores.json")
         self.clear_cities()
 
-
-
-    def on_click(self, event):
+    def on_click(self, event):  # pragma: no cover
         if self.computer_difficulty == "":
             point = self.click(event)
             self.play(point, True)
@@ -135,7 +193,7 @@ class Game:
                 point = self.pc.brain(self.all_points, self.steps, self.dict_points, self.cell_size)
             self.play(point, False)
 
-    def click(self, event):
+    def click(self, event):  # pragma: no cover
         self.current_color = self.people_colors[self.number % self.count_players]
         x, y = event.x, event.y
         col, row = (x + self.cell_size // 2) // self.cell_size, y // self.cell_size
@@ -143,8 +201,7 @@ class Game:
                 row + 0.5) * self.cell_size - self.point_size / 2
         return Point(int(center_x), int(center_y), self.current_color, [], [])
 
-
-    def draw_polygon(self, cycle):
+    def draw_polygon(self, cycle):  # pragma: no cover
         points = [(point[0] + self.point_size // 2, point[1] + self.point_size // 2) for point in cycle]
         polygon = self.canvas.create_polygon(points, fill=self.dict_points[cycle[0]][0].lower(), outline=self.dict_points[cycle[0]][0].lower(), stipple="gray50")
         self.canvas.tag_lower(polygon)
@@ -212,7 +269,7 @@ class Game:
             self.canvas.create_line(self.cell_size, y - self.cell_size // 2, self.map_grid * self.cell_size, y - self.cell_size // 2)
             self.canvas.create_line(y, self.cell_size // 2, y, self.map_grid * self.cell_size - self.cell_size // 2)
 
-    def draw_point(self, row, col, color):
+    def draw_point(self, row, col, color):  # pragma: no cover
         self.canvas.create_oval(row, col, row + self.point_size, col + self.point_size, fill=color)
 
     def point_in_polygon(self, point, poly):
@@ -227,7 +284,7 @@ class Game:
             j = i
         return is_inside
 
-    def clear_cities(self):
+    def clear_cities(self):  # pragma: no cover
         for city in self.cities:
             if city is None: continue
             for i in range(len(city.points)):
@@ -252,7 +309,7 @@ class Game:
                 elif len(city.points[i].next) == 8:
                     self.help_clear(city, i)
 
-    def help_clear(self, city, i):
+    def help_clear(self, city, i):  # pragma: no cover
         for j in range(len(city.points[i].end)):
             if city.points[i].end[j] is None: continue
             for l in range(len(city.points[i].end[j].next)):

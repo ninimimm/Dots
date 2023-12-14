@@ -44,27 +44,19 @@ class GUI:
         main_frame = ttk.Frame(self.root, padding="20")
         main_frame.grid(row=0, column=0)
 
-        # Устанавливаем растягивание рядов и колонок на главном окне root
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
 
-        # Создаем фрейм внутри главного фрейма для центрирования элементов
         center_frame = ttk.Frame(main_frame)
         center_frame.grid(row=0, column=0, padx=10, pady=10)
 
-        # Создаем стиль для кнопок
         button_style = ttk.Style()
-        # Увеличиваем размер шрифта для кнопок
         button_style.configure("Custom.TButton", font=("Helvetica", 14))
-        # Увеличиваем внутренний и внешний паддинг для кнопок
         button_style.configure("Custom.TButton", padding=10)
 
-        # Создаем стиль для надписи
         label_style = ttk.Style()
-        # Увеличиваем размер шрифта для надписи
         label_style.configure("Custom.TLabel", font=("Helvetica", 16))
 
-        # Создаем новый стиль для OptionMenu, чтобы сохранить значок списка
         players_style = ttk.Style()
         players_style.configure("Custom.TMenubutton", font=("Helvetica", 12), background="lightblue", foreground="black")
 
@@ -81,11 +73,9 @@ class GUI:
         player_options_frame = ttk.Frame(self.root, padding="20")
         player_options_frame.grid(row=0, column=0)
 
-        # Устанавливаем растягивание рядов и колонок на основном окне root
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
 
-        # Создаем фрейм внутри player_options_frame для центрирования элементов
         center_frame = ttk.Frame(player_options_frame)
         center_frame.grid(row=0, column=0, padx=10, pady=10)
 
@@ -94,7 +84,6 @@ class GUI:
         players_values = [2, 3, 4]
         self. players.set(players_values[0])
 
-        # Применяем стиль "Custom.TMenubutton" к OptionMenu
         players_menu = ttk.OptionMenu(center_frame, self.players, players_values[0], *players_values,
                                       style="Custom.TMenubutton")
         players_menu.grid(row=0, column=1, pady=(0, 10))
@@ -109,14 +98,10 @@ class GUI:
                                          style="Custom.TMenubutton")
         board_size_menu.grid(row=1, column=1, pady=(0, 10))
 
-        ttk.Button(center_frame, text="Начать игру", command=lambda:self.start_game("P", "", self.players.get(), self.board_size.get()), width=20, style="Custom.TButton").grid(row=2,
-                                                                                                                column=0,
-                                                                                                                columnspan=2,
-                                                                                                                pady=(
-                                                                                                                10, 0))
-        ttk.Button(center_frame, text="Назад", command=lambda:self.return_to_main_menu(), style="Custom.TButton").grid(row=3, column=0,
-                                                                                                         columnspan=2,
-                                                                                                         pady=(10, 0))
+        ttk.Button(center_frame, text="Начать игру", command=lambda:self.start_game("P", "", self.players.get(),
+        self.board_size.get()), width=20, style="Custom.TButton").grid(row=2, column=0, columnspan=2, pady=(10, 0))
+        ttk.Button(center_frame, text="Назад", command=lambda:self.return_to_main_menu(), style="Custom.TButton")\
+            .grid(row=3, column=0, columnspan=2, pady=(10, 0))
 
     def create_computer_options(self):
         global main_frame
@@ -125,11 +110,9 @@ class GUI:
         computer_options_frame = ttk.Frame(self.root, padding="20")
         computer_options_frame.grid(row=0, column=0)
 
-        # Устанавливаем растягивание рядов и колонок на основном окне root
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
 
-        # Создаем фрейм внутри computer_options_frame для центрирования элементов
         center_frame = ttk.Frame(computer_options_frame)
         center_frame.grid(row=0, column=0, padx=10, pady=10)
 
@@ -137,12 +120,12 @@ class GUI:
         computer_difficulty_label.grid(row=0, column=0, pady=(0, 10), sticky="W")
         computer_difficulty_values = ["Рандомный", "Сложный"]
         self.computer_difficulty.set(computer_difficulty_values[0])
-        board_size_menu = ttk.OptionMenu(center_frame, self.computer_difficulty, computer_difficulty_values[0], *computer_difficulty_values,
-                                         style="Custom.TMenubutton")
+        board_size_menu = ttk.OptionMenu(center_frame, self.computer_difficulty, computer_difficulty_values[0],
+                                         *computer_difficulty_values, style="Custom.TMenubutton")
         board_size_menu.grid(row=0, column=1, pady=(0, 10))
 
-        computer_difficulty_menu = ttk.OptionMenu(center_frame, self.computer_difficulty, computer_difficulty_values[0], *computer_difficulty_values,
-                                         style="Custom.TMenubutton")
+        computer_difficulty_menu = ttk.OptionMenu(center_frame, self.computer_difficulty, computer_difficulty_values[0],
+                                                  *computer_difficulty_values, style="Custom.TMenubutton")
         computer_difficulty_menu.grid(row=0, column=1, pady=(0, 10), sticky="W")
 
         board_size_label = ttk.Label(center_frame, text="Размер поля:", style="Custom.TLabel")
@@ -150,16 +133,18 @@ class GUI:
         board_size_values = [8, 10, 12, 15, 20]
         self.board_size.set(board_size_values[0])
         board_size_menu = ttk.OptionMenu(center_frame, self.board_size, board_size_values[0],
-                                         *board_size_values,
-                                         style="Custom.TMenubutton")
+                                         *board_size_values, style="Custom.TMenubutton")
         board_size_menu.grid(row=1, column=1, pady=(0, 10))
 
         board_size_menu = ttk.OptionMenu(center_frame, self.board_size, board_size_values[0], *board_size_values,
                                          style="Custom.TMenubutton")
         board_size_menu.grid(row=1, column=1, pady=(0, 10))
 
-        ttk.Button(center_frame, text="Начать игру", command=lambda:self.start_game("PC", self.computer_difficulty.get(), 1, self.board_size.get()), width=20, style="Custom.TButton").grid(row=2, column=0, columnspan=2, pady=(10, 0))
-        ttk.Button(center_frame, text="Назад", command= lambda:self.return_to_main_menu(), style="Custom.TButton").grid(row=3, column=0, columnspan=2, pady=(10, 0))
+        ttk.Button(center_frame, text="Начать игру", command=lambda:
+        self.start_game("PC", self.computer_difficulty.get(), 1, self.board_size.get()),
+                   width=20, style="Custom.TButton").grid(row=2, column=0, columnspan=2, pady=(10, 0))
+        ttk.Button(center_frame, text="Назад", command= lambda:self.return_to_main_menu(), style="Custom.TButton")\
+            .grid(row=3, column=0, columnspan=2, pady=(10, 0))
 
     def create_score_table(self):
         tabel = self.load_scores_from_json("scores.json")
@@ -167,27 +152,21 @@ class GUI:
         if tabel is None:
             return
 
-        # Преобразуем словарь в список кортежей для сортировки
         score_list = [(player_name, score) for player_name, score in tabel.items()]
 
-        # Сортируем список по убыванию счета
         score_list.sort(key=lambda x: x[1], reverse=True)
 
-        # Создаем новое окно для таблицы рекордов и устанавливаем размеры
         score_window = tk.Toplevel(self.root)
         score_window.title("Таблица рекордов")
-        score_window.geometry("1000x1000")  # Установите размеры окна по вашему усмотрению
+        score_window.geometry("1000x1000")
 
-        # Создаем фрейм для размещения таблицы
         scores_frame = tk.Frame(score_window)
         scores_frame.pack()
 
-        # Создаем заголовок таблицы
         scores_label = tk.Label(scores_frame, text=f"Имя пользователя{' ' * 12}Счет", font=("Helvetica", 16),
                                 anchor='w')
         scores_label.grid(row=0, column=0, sticky='w')
 
-        # Создаем ярлыки для каждого игрока и добавляем данные из отсортированного списка
         row = 1
         for player_name, score in score_list:
             score_label = tk.Label(scores_frame, text=f"{player_name}{' ' * 25}{score}", font=("Helvetica", 18),
@@ -196,7 +175,6 @@ class GUI:
             row += 1
 
     def load_scores_from_json(self, file_path):
-        # Загрузить счеты из JSON файла
         with open(file_path, "r") as json_file:
             return json.load(json_file)
 
@@ -205,8 +183,6 @@ class GUI:
             self.root.quit()
 
     def return_to_main_menu(self):
-        # Удаляем все дочерние элементы у главного окна
         for child in self.root.winfo_children():
             child.destroy()
-        # Заново создаем главное меню
         self.create_main_menu()
